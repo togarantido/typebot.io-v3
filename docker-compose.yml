@@ -48,12 +48,27 @@ services:
     image: baptistearno/typebot-builder:latest
     ports:
       - "8080:3000"
+    expose:
+      - "3000"
 
   typebot-viewer:
     <<: *typebot-common
     image: baptistearno/typebot-viewer:latest
     ports:
       - "8081:3000"
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    restart: always
+    ports: 
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+        - typebot-network
 
 networks:
   typebot-network:
