@@ -21,6 +21,7 @@ firebaseServiceAccount.json
 
 .env.production
 .env.staging
+.env.backup
 
 # Wordpress
 .svn

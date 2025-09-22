@@ -70,6 +70,19 @@ services:
     networks:
         - typebot-network
 
+  db-backup:
+    image: alpine:3.20
+    depends_on:
+      - typebot-db
+    env_file:
+      - ./.env.backup
+    volumes:
+      - /opt/typebot-backups:/backups           # <-- volume externo (dumps)
+      - ./ops/backup:/scripts:ro                # <-- scripts do repo
+    entrypoint: ["/scripts/entrypoint.sh"]
+    networks:
+      - typebot-network
+
 networks:
   typebot-network:
     driver: bridge
