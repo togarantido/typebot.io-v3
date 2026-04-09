@@ -44,7 +44,7 @@ COPY --from=builder --chown=node:node /app/apps/${SCOPE}/public ./apps/${SCOPE}/
 
 COPY scripts/${SCOPE}-entrypoint.sh ./
 RUN chmod +x ./${SCOPE}-entrypoint.sh
-USER node
+USER root
 ENTRYPOINT ./${SCOPE}-entrypoint.sh
 
 EXPOSE 3000
