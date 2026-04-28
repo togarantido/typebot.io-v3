@@ -48,7 +48,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run smokes
-        run: npx playwright test --grep @smoke
+        # dd-trace/ci/init habilita Datadog CI Visibility no modo agentless.
+        run: NODE_OPTIONS="-r dd-trace/ci/init" npx playwright test --grep @smoke
 
       - name: Upload report
         if: failure()
