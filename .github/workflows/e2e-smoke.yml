@@ -1,0 +1,59 @@
+name: E2E smoke
+
+# Smokes Playwright em PR contra dev/main no fork self-hosted do Typebot.
+# Foco em garantir que o flow `ifood-001-e2e` ainda funciona end-to-end.
+
+on:
+  pull_request:
+    branches: [dev, main]
+    paths:
+      - "apps/viewer/**"
+      - "packages/**"
+      - "tests-e2e/**"
+      - ".github/workflows/e2e-smoke.yml"
+
+concurrency:
+  group: e2e-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tests-e2e
+    env:
+      DD_API_KEY: ${{ secrets.DD_API_KEY }}
+      DD_SERVICE: tog-typebot-e2e
+      DD_ENV: ci
+      DD_CIVISIBILITY_AGENTLESS_ENABLED: "true"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+          scope: "@togarantido"
+
+      - name: Install
+        run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smokes
+        run: npx playwright test --grep @smoke
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: tests-e2e/playwright-report/
+          retention-days: 14

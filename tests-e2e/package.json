@@ -1,0 +1,17 @@
+{
+  "name": "typebot-fork-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Playwright smokes pro fork self-hosted do Typebot (consome @togarantido/e2e-utils).",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@togarantido/e2e-utils": "^0.1.0",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.4"
+  }
+}
