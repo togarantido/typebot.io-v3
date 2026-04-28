@@ -1,0 +1,36 @@
+name: Trigger funnel E2E
+
+# Quando algo é mergeado em dev no fork, dispara o funnel cross-app
+# no repo `tog-e2e`. Aguarda 2min pra dar tempo do Railway terminar
+# o deploy do staging antes do teste rodar.
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - "**/*.md"
+      - ".github/**"
+      - "tests-e2e/**"
+      - "docs/**"
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for staging deploy to settle
+        run: sleep 120
+
+      - name: Trigger tog-e2e funnel run
+        run: |
+          curl --silent --show-error --fail -X POST \
+            -H "Authorization: token ${{ secrets.TOG_E2E_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/togarantido/tog-e2e/dispatches \
+            -d '{
+              "event_type": "funnel-e2e-trigger",
+              "client_payload": {
+                "source_repo": "${{ github.repository }}",
+                "source_sha": "${{ github.sha }}"
+              }
+            }'
